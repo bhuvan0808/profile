@@ -4,27 +4,27 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Bhuvan Boddu · Founder</title>
-<meta name="description" content="Boddu Venkata Sai Bhuvan. Founding CTO who took Aharyas from zero to ~$4K MRR, solo founder of LinkYaar, board member at BetterIntegrations, AI engineer who pre-trained an LLM that beats GPT-2. Three modes: Founder, Builder, AI Engineer." />
+<meta name="description" content="Boddu Venkata Sai Bhuvan. Solo founder of LinkYaar and BuyMeAGoddie, co-founder of a stealth Gen Z brand, founding CTO at Aharyas, board member at BetterIntegrations, and the engineer who trained an LLM that beats GPT-2. Three modes: Founder, Consultant, AI Engineer." />
 <meta name="theme-color" content="#0c1220" />
-<meta property="og:title" content="Bhuvan Boddu · Founder · Builder · AI Engineer" />
-<meta property="og:description" content="I build consumer businesses from the ground up. Founding CTO, solo founder of 8+ live products, and the engineer who trained an LLM that beats GPT-2 for $1,150." />
+<meta property="og:title" content="Bhuvan Boddu · Founder · Consultant · AI Engineer" />
+<meta property="og:description" content="I build consumer businesses from the ground up. LinkYaar, BuyMeAGoddie, a stealth Gen Z brand, Aharyas, and an LLM that beats GPT-2 for $1,150." />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://bhuvanbodduprofile.vercel.app/" />
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Bebas+Neue&family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;1,9..144,600;1,9..144,700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Bebas+Neue&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="css/base.css" />
 <link rel="stylesheet" href="css/founder.css" />
-<link rel="stylesheet" href="css/builder.css" />
+<link rel="stylesheet" href="css/consultant.css" />
 <link rel="stylesheet" href="css/engineer.css" />
 <script>
   (function () {
     try {
       var p = new URLSearchParams(location.search).get('mode') || localStorage.getItem('bb-mode');
-      if (p === 'ai') p = 'engineer';
-      if (p && ['founder', 'builder', 'engineer'].indexOf(p) > -1) document.documentElement.setAttribute('data-mode', p);
+      if (p === 'ai') p = 'engineer'; if (p === 'builder') p = 'consultant';
+      if (p && ['founder', 'consultant', 'engineer'].indexOf(p) > -1) document.documentElement.setAttribute('data-mode', p);
     } catch (e) {}
   })();
 </script>
@@ -33,6 +33,7 @@
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="bat" viewBox="0 0 200 100"><path d="M100 28 L106 10 L112 30 C140 14 172 12 200 24 C182 36 172 52 168 66 C160 54 150 50 142 56 C138 68 132 76 126 84 C120 72 112 66 106 70 C104 78 102 84 100 90 C98 84 96 78 94 70 C88 66 80 72 74 84 C68 76 62 68 58 56 C50 50 40 54 32 66 C28 52 18 36 0 24 C28 12 60 14 88 30 L94 10 Z"/></symbol>
+  <symbol id="sig" viewBox="0 0 320 90"><path class="sig-main" pathLength="1" d="M14 58 C22 30 40 14 44 30 C48 46 26 70 22 56 C18 40 48 30 66 34 C80 38 74 60 62 60 C50 60 62 34 84 32 C104 30 106 58 92 60 C80 62 96 30 118 30 C140 30 138 62 124 62 C112 62 128 30 150 32 C172 34 170 62 156 62 C144 62 160 30 182 34 C204 38 200 64 186 62 C174 60 196 30 220 32 C246 34 240 66 228 64 C216 62 236 28 262 34 C282 38 274 64 266 60 C258 56 280 40 306 44"/><path class="sig-line" pathLength="1" d="M18 80 C110 70 210 84 302 72"/></symbol>
 </svg>
 
 <canvas id="bg" class="bg-canvas" aria-hidden="true"></canvas>
@@ -42,8 +43,9 @@
 <div id="trans" class="trans" aria-hidden="true">
   <div class="trans-iris"><svg class="trans-bat" viewBox="0 0 200 100"><use href="#bat"/></svg></div>
   <div class="trans-hole"></div>
-  <div class="trans-ink-2"></div>
-  <div class="trans-ink"></div>
+  <div class="trans-door trans-door-l"></div>
+  <div class="trans-door trans-door-r"></div>
+  <div class="trans-door-label">Take the meeting.</div>
   <div class="trans-hud"><div class="trans-hud-ring"></div><div class="trans-hud-label">Assembling</div></div>
 </div>
 
@@ -63,7 +65,7 @@
       <div class="mode-toggle" id="modeToggle" role="group" aria-label="Switch mode">
         <span class="mode-pill" aria-hidden="true"></span>
         <button type="button" data-mode="founder" aria-pressed="false" title="Founder (1)">Founder</button>
-        <button type="button" data-mode="builder" aria-pressed="false" title="Builder (2)">Builder</button>
+        <button type="button" data-mode="consultant" aria-pressed="false" title="Consultant (2)">Consultant</button>
         <button type="button" data-mode="engineer" aria-pressed="false" title="AI Engineer (3)">AI Engineer</button>
       </div>
       <button class="burger" id="burger" type="button" aria-label="Menu"><span></span><span></span></button>
@@ -89,23 +91,65 @@
       </div>
 
       <div class="hero-stage" id="heroStage">
-        <!-- builder: the arena -->
-        <div class="arena only-builder" id="arena">
-          <div class="hud">
-            <div class="hud-side"><span class="hud-name">Bhuvan</span><div class="hud-bar"><i style="width:100%"></i></div></div>
-            <div class="hud-round" id="hudRound">Round 1</div>
-            <div class="hud-side right"><span class="hud-name excuse" id="excuseName">No budget</span><div class="hud-bar"><i id="hpEnemy" style="width:100%"></i></div></div>
+        <!-- consultant: the term sheet -->
+        <div class="deal only-consultant" id="deal" title="Click to close the next deal">
+          <div class="deal-head"><span>Term sheet</span><span id="dealNo">No. 0041</span></div>
+          <h3 id="dealClient">BetterIntegrations</h3>
+          <dl class="deal-rows">
+            <div><dt>Scope</dt><dd id="dealScope">Head of Marketing · board member · B2B pipeline</dd></div>
+            <div><dt>Terms</dt><dd id="dealTerms">Base plus vested equity. Skin in the game.</dd></div>
+            <div><dt>Value</dt><dd id="dealValue">₹10 Cr pipeline</dd></div>
+          </dl>
+          <div class="deal-sign">
+            <svg class="signature" viewBox="0 0 320 90" aria-hidden="true"><path class="sig-main" pathLength="1" d="M14 58 C22 30 40 14 44 30 C48 46 26 70 22 56 C18 40 48 30 66 34 C80 38 74 60 62 60 C50 60 62 34 84 32 C104 30 106 58 92 60 C80 62 96 30 118 30 C140 30 138 62 124 62 C112 62 128 30 150 32 C172 34 170 62 156 62 C144 62 160 30 182 34 C204 38 200 64 186 62 C174 60 196 30 220 32 C246 34 240 66 228 64 C216 62 236 28 262 34 C282 38 274 64 266 60 C258 56 280 40 306 44"/><path class="sig-line" pathLength="1" d="M18 80 C110 70 210 84 302 72"/></svg>
+            <span class="deal-stamp">Closed</span>
           </div>
-          <div class="ko" id="ko"><span>K.O.</span><small>Excuse eliminated</small></div>
-          <div class="arena-hint" id="arenaHint">Click or tap the arena to strike</div>
+          <p class="deal-hint">Click to close the next deal</p>
         </div>
 
-        <!-- engineer: the reactor -->
-        <div class="reactor only-engineer" id="reactor">
+        <!-- engineer: the armour -->
+        <div class="suit only-engineer" id="suit">
+          <p class="jarvis" id="jarvisLine"></p>
           <div class="hud-read tl"><span>Core output</span><b data-base="3.2" data-jitter="0.06" data-dec="2" data-suf=" GW">3.20 GW</b><i></i></div>
           <div class="hud-read tr"><span>Perplexity</span><b>29.19</b><i></i></div>
           <div class="hud-read bl"><span>Throughput</span><b data-base="320" data-jitter="6" data-dec="0" data-suf="K tok/s">320K tok/s</b><i></i></div>
           <div class="hud-read br"><span>Uptime</span><b>30 d · 0 failures</b><i></i></div>
+          <div class="suit-body">
+            <svg class="suit-svg" viewBox="0 0 300 560" aria-hidden="true">
+              <defs>
+                <linearGradient id="gRed" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9303c"/><stop offset="0.6" stop-color="#9d1b26"/><stop offset="1" stop-color="#5e0f16"/></linearGradient>
+                <linearGradient id="gRed2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e04250"/><stop offset="1" stop-color="#7a141d"/></linearGradient>
+                <linearGradient id="gGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3d98a"/><stop offset="0.5" stop-color="#d4a53a"/><stop offset="1" stop-color="#8f6a1c"/></linearGradient>
+                <linearGradient id="gSteel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3f4b"/><stop offset="1" stop-color="#15181f"/></linearGradient>
+                <radialGradient id="gEye" cx="0.5" cy="0.5" r="0.6"><stop offset="0" stop-color="#ffffff"/><stop offset="0.5" stop-color="#bfefff"/><stop offset="1" stop-color="#3ec8ff" stop-opacity="0.25"/></radialGradient>
+                <linearGradient id="gSheen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="0.5" stop-color="#fff" stop-opacity="0.35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+                <filter id="glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                <clipPath id="clipBody"><rect x="0" y="0" width="300" height="560"/></clipPath>
+              </defs>
+              <g clip-path="url(#clipBody)">
+                <path d="M14 560 L14 470 C14 428 70 404 118 396 L150 390 L182 396 C230 404 286 428 286 470 L286 560 Z" fill="url(#gRed)"/>
+                <path d="M14 480 C40 462 80 452 118 448 L150 446 L182 448 C220 452 260 462 286 480 L286 496 C260 478 220 468 182 466 L150 464 L118 466 C80 468 40 478 14 496 Z" fill="url(#gGold)" opacity="0.9"/>
+                <path d="M96 560 L96 452 C96 428 120 412 150 410 C180 412 204 428 204 452 L204 560 Z" fill="url(#gSteel)"/>
+                <path d="M104 560 L104 456 C104 438 124 426 150 424 C176 426 196 438 196 456 L196 560 Z" fill="url(#gRed2)" opacity="0.92"/>
+                <circle cx="150" cy="470" r="54" fill="#0b0d14" stroke="#c8952b" stroke-width="3"/>
+                <path d="M118 338 L182 338 L192 402 L108 402 Z" fill="url(#gSteel)"/>
+                <path d="M150 18 C232 18 264 80 264 160 C264 252 232 332 150 344 C68 332 36 252 36 160 C36 80 68 18 150 18 Z" fill="url(#gRed)"/>
+                <path d="M150 30 C205 30 236 78 238 150 C238 200 224 240 210 262 C222 220 226 170 222 130 C214 82 186 44 150 40 C114 44 86 82 78 130 C74 170 78 220 90 262 C76 240 62 200 62 150 C64 78 95 30 150 30 Z" fill="rgba(255,255,255,0.08)"/>
+                <g class="s-face">
+                  <path d="M150 62 C204 62 232 104 232 164 C232 236 206 302 150 310 C94 302 68 236 68 164 C68 104 96 62 150 62 Z" fill="url(#gGold)"/>
+                  <path d="M84 130 L216 130 L224 150 L76 150 Z" fill="#a67c22" opacity="0.75"/>
+                  <path d="M96 100 L204 100 L214 122 L86 122 Z" fill="#b8892a" opacity="0.4"/>
+                  <path class="s-eye" d="M86 168 L130 156 L134 172 L92 184 Z" fill="url(#gEye)" filter="url(#glow)"/>
+                  <path class="s-eye" d="M214 168 L170 156 L166 172 L208 184 Z" fill="url(#gEye)" filter="url(#glow)"/>
+                  <path d="M150 178 L150 226 M120 200 C128 226 138 240 150 244 C162 240 172 226 180 200" stroke="#7a5a15" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                  <path d="M114 246 L186 246 L180 258 L120 258 Z" fill="#3a2b08" opacity="0.85"/>
+                  <path d="M110 270 L190 270 L176 298 L124 298 Z" fill="#a67c22" opacity="0.6"/>
+                </g>
+                <rect class="s-sheen" x="0" y="0" width="300" height="140" fill="url(#gSheen)" opacity="0"/>
+              </g>
+            </svg>
+            <div class="reactor-core" id="reactorCore"></div>
+          </div>
           <div class="reactor-hint" id="reactorHint">Click the reactor</div>
         </div>
       </div>
@@ -261,14 +305,16 @@
               <p class="signal-msg">Signal received</p>
               <button class="btn btn-primary signal-btn" id="signalBtn" type="button">Light the signal</button>
             </div>
-            <div class="stage-builder only-builder">
-              <div class="vs-row">
-                <div class="vs-name">Bhuvan<small>41 repos · 8+ live</small></div>
-                <div class="vs-badge">vs</div>
-                <div class="vs-name problem" id="problemName">Your problem</div>
+            <div class="stage-consultant only-consultant">
+              <div class="terms">
+                <div class="terms-head"><span>Term sheet</span><span>Draft</span></div>
+                <h3>Your terms</h3>
+                <p class="terms-clause" id="termsClause">Your terms appear here as you type.</p>
+                <div class="terms-foot">
+                  <svg class="signature" viewBox="0 0 320 90" aria-hidden="true"><path class="sig-main" pathLength="1" d="M14 58 C22 30 40 14 44 30 C48 46 26 70 22 56 C18 40 48 30 66 34 C80 38 74 60 62 60 C50 60 62 34 84 32 C104 30 106 58 92 60 C80 62 96 30 118 30 C140 30 138 62 124 62 C112 62 128 30 150 32 C172 34 170 62 156 62 C144 62 160 30 182 34 C204 38 200 64 186 62 C174 60 196 30 220 32 C246 34 240 66 228 64 C216 62 236 28 262 34 C282 38 274 64 266 60 C258 56 280 40 306 44"/><path class="sig-line" pathLength="1" d="M18 80 C110 70 210 84 302 72"/></svg>
+                  <button class="btn btn-primary" id="signBtn" type="button">Sign it</button>
+                </div>
               </div>
-              <p class="vs-status">Type your problem in the form to send it in</p>
-              <button class="btn btn-primary" id="fightBtn" type="button">Fight</button>
             </div>
             <div class="stage-engineer only-engineer">
               <div class="channel-bar"><span class="dot"></span><span>Secure channel</span><button class="rerun" id="channelRerun" type="button">Re-run</button></div>
@@ -293,7 +339,7 @@
 <footer class="footer">
   <div class="wrap footer-inner">
     <span>© <span id="year">2026</span> Boddu Venkata Sai Bhuvan · <span data-copy="footerLine">Built by hand.</span></span>
-    <span>Switch modes <span class="kbd">1</span>Founder <span class="kbd">2</span>Builder <span class="kbd">3</span>AI Engineer</span>
+    <span>Switch modes <span class="kbd">1</span>Founder <span class="kbd">2</span>Consultant <span class="kbd">3</span>AI Engineer</span>
   </div>
 </footer>
 </div></div>
@@ -307,7 +353,7 @@
 <script src="js/data.js"></script>
 <script src="js/sound.js"></script>
 <script src="js/fx-founder.js"></script>
-<script src="js/fx-builder.js"></script>
+<script src="js/fx-consultant.js"></script>
 <script src="js/fx-engineer.js"></script>
 <script src="js/app.js"></script>
 </body>
