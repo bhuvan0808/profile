@@ -1,7 +1,8 @@
 /* ==================================================================
-   app.js — mode manager, rendering, reveals, transitions, cursor,
-   nav, filters, contact form. Depends on data.js and the three FX
-   engines; GSAP + ScrollTrigger are optional (graceful fallback).
+   app.js — mode manager, rendering, smooth scroll, reveals,
+   transitions, sound toggle, nav, filters, contact form.
+   Depends on data.js, sound.js and the three engines.
+   GSAP + ScrollTrigger (+ ScrollSmoother, SplitText) are optional.
    ================================================================== */
 (function () {
   'use strict';
@@ -10,71 +11,54 @@
   const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-  const MODES = ['builder', 'founder', 'ai'];
-  const THEMES = { builder: window.FX_BUILDER, founder: window.FX_FOUNDER, ai: window.FX_AI };
-  const THEME_COLOR = { builder: '#0a0809', founder: '#06070c', ai: '#050812' };
+  const MODES = ['founder', 'builder', 'engineer'];
+  const THEMES = { founder: window.FX_FOUNDER, builder: window.FX_BUILDER, engineer: window.FX_ENGINEER };
+  const THEME_COLOR = { founder: '#0c1220', builder: '#f2f5e9', engineer: '#f5f1ea' };
   const hasGsap = typeof window.gsap !== 'undefined' && typeof window.ScrollTrigger !== 'undefined';
-  if (hasGsap) gsap.registerPlugin(ScrollTrigger);
+  const hasSmoother = hasGsap && typeof window.ScrollSmoother !== 'undefined';
+  const hasSplit = hasGsap && typeof window.SplitText !== 'undefined';
+  if (hasGsap) { const plugins = [ScrollTrigger]; if (hasSmoother) plugins.push(ScrollSmoother); if (hasSplit) plugins.push(SplitText); gsap.registerPlugin(...plugins); }
   const rand = (a, b) => a + Math.random() * (b - a);
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const ext = href => (/^https?:/.test(href) ? ' target="_blank" rel="noopener"' : '');
-  let mode = null, busy = false, triggers = [], heroTyper = null;
+  let mode = null, busy = false, triggers = [], splits = [], storyTrigs = [], smoother = null;
 
   /* ================= static rendering ================= */
   function renderStatic() {
+    const items = D.marquee.concat(D.marquee);
+    $('#marqueeTrack').innerHTML = items.map(t => `<span>${esc(t)}</span>`).join('');
+
+    $('#principlesList').innerHTML = D.principles.map(p => `
+      <div class="prow" data-reveal><span class="n">${p.n}</span><h3>${esc(p.title)}</h3><p>${esc(p.desc)}</p></div>`).join('');
+
     $('#timeline').innerHTML = D.experience.map(x => `
-      <div class="tl-item${x.current ? ' current' : ''}" data-reveal>
-        <span class="tl-dot"></span>
-        <div class="tl-date">${esc(x.date)}${x.current ? '<span class="tl-now">NOW</span>' : ''}</div>
-        <h3 class="tl-role">${esc(x.role)}</h3>
-        <p class="tl-org">${esc(x.org)}</p>
-        <ul>${x.points.map(p => `<li>${p}</li>`).join('')}</ul>
-      </div>`).join('') + '<div class="tl-track"><i class="tl-line"></i></div>';
+      <div class="tl-item" data-reveal>
+        <div class="tl-date">${esc(x.date)}${x.current ? '<span class="now">Now</span>' : ''}</div>
+        <div><h3 class="tl-role">${esc(x.role)}</h3><p class="tl-org">${esc(x.org)}</p>
+          <ul>${x.points.map(p => `<li>${esc(p)}</li>`).join('')}</ul></div>
+      </div>`).join('');
 
     $('#filters').innerHTML = D.repoFilters.map(([k, l], i) => `<button class="fbtn${i === 0 ? ' active' : ''}" data-f="${k}" type="button">${esc(l)}</button>`).join('');
     $('#repoGrid').innerHTML = D.repos.map(r => `
       <article class="card repo" data-cats="${r.cat.join(' ')}" data-reveal>
-        <div class="repo-top"><span class="repo-name"><span>${r.emoji}</span>${esc(r.n)}</span><span class="repo-badge">${esc(r.badge)}</span></div>
+        <div class="repo-top"><span class="repo-name">${esc(r.n)}</span><span class="repo-badge">${esc(r.badge)}</span></div>
         <p>${esc(r.desc)}</p>
-        <div class="tags">${r.tags.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>
+        <div class="repo-tags">${r.tags.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>
         <div class="repo-foot">
           <span class="lang"><i style="background:${D.langColors[r.lang] || '#888'}"></i>${esc(r.lang)}</span>
-          <span class="repo-links"><a href="${r.link}"${ext(r.link)}>${/github\.com/.test(r.link) ? 'GitHub' : 'Visit'} ↗</a>${r.link2 ? `<a href="${r.link2}"${ext(r.link2)}>${/github\.com/.test(r.link2) ? 'Code' : 'Site'} ↗</a>` : ''}</span>
+          <span class="repo-links"><a href="${r.link}"${ext(r.link)}>${/github\.com/.test(r.link) ? 'GitHub' : 'Open'} ↗</a>${r.link2 ? `<a href="${r.link2}"${ext(r.link2)}>${/github\.com/.test(r.link2) ? 'Code' : 'Site'} ↗</a>` : ''}</span>
         </div>
       </article>`).join('');
 
-    $('#skillsGrid').innerHTML = D.skills.map(s => `
-      <article class="card skill" data-reveal><h3><span>${s.icon}</span>${esc(s.title)}</h3>
-        <div class="chips">${s.items.map(i => `<span class="chip">${esc(i)}</span>`).join('')}</div></article>`).join('');
+    $('#countries').innerHTML = D.world.countries.map(([code, n]) => `<span class="country" data-reveal><img class="flag" src="https://flagcdn.com/32x24/${code}.png" srcset="https://flagcdn.com/64x48/${code}.png 2x" width="22" height="16" alt="" loading="lazy">${esc(n)}</span>`).join('');
+    $('#worldFacts').innerHTML = D.world.facts.map(f => `<div class="wfact" data-reveal><div class="wfact-v">${esc(f.v)}</div><div class="wfact-l">${esc(f.l)}</div></div>`).join('');
 
     $('#eduGrid').innerHTML = D.education.map(e => `
-      <article class="card edu${e.hot ? ' hot' : ''}" data-reveal><h3>${esc(e.title)}</h3><p class="edu-org">${esc(e.org)}</p>
-        ${e.desc ? `<p class="edu-desc">${esc(e.desc)}</p>` : ''}<span class="edu-status">${esc(e.status)}</span></article>`).join('');
+      <article class="card edu" data-reveal><h3>${esc(e.title)}</h3><p class="org">${esc(e.org)}</p>${e.desc ? `<p class="desc">${esc(e.desc)}</p>` : ''}<span class="when">${esc(e.status)}</span></article>`).join('');
+    $('#recGrid').innerHTML = D.recognition.map(r => `
+      <article class="card rec" data-reveal><h3>${esc(r.title)}</h3><p>${esc(r.desc)}</p>${r.link ? `<a class="arrow-link" href="${r.link}"${ext(r.link)}>${esc(r.linkText)}</a>` : ''}</article>`).join('');
 
-    $('#beyondGrid').innerHTML = D.beyond.map(b => `
-      <article class="card bcard" data-reveal><span class="b-icon">${b.icon}</span><h3>${esc(b.title)}</h3><p>${esc(b.desc)}</p>
-        ${b.link ? `<a class="link-arrow" href="${b.link}"${ext(b.link)}>${esc(b.linkText)} ↗</a>` : ''}</article>`).join('');
-
-    $('#principlesGrid').innerHTML = D.principles.map(p => `
-      <article class="card pcard" data-reveal><span class="pcard-n">${p.n} //</span><h3>${esc(p.title)}</h3><p>${esc(p.desc)}</p></article>`).join('');
-
-    $('#venturesList').innerHTML = D.ventures.map(v => `
-      <div class="card vrow" data-reveal>
-        <div class="v-main"><h3>${esc(v.name)}</h3><p class="v-role">${esc(v.role)}</p></div>
-        <p class="v-outcome">${esc(v.outcome)}</p>
-        <div class="v-side"><span class="v-status tone-${v.tone}">${esc(v.status)}</span>${v.link ? `<a class="link-arrow" href="${v.link}"${ext(v.link)}>${esc(v.linkText)} ↗</a>` : ''}</div>
-      </div>`).join('');
-
-    $('#countries').innerHTML = D.world.countries.map(([code, n]) => `<span class="country" data-reveal><img class="flag" src="https://flagcdn.com/32x24/${code}.png" srcset="https://flagcdn.com/64x48/${code}.png 2x" width="24" height="18" alt="" loading="lazy">${esc(n)}</span>`).join('');
-    $('#worldFacts').innerHTML = D.world.facts.map(f => `<div class="card wfact" data-reveal><div class="wfact-v">${esc(f.v)}</div><div class="wfact-l">${esc(f.l)}</div></div>`).join('');
-
-    $('#contactLinks').innerHTML = [
-      ['Email', D.email, 'mailto:' + D.email],
-      ['LinkedIn', 'linkedin.com/in/bhuvanboddu', D.linkedin],
-      ['GitHub', 'github.com/bhuvan0808 · 41 repos', D.github],
-      ['Phone', D.phone, D.phoneHref],
-      ['Products', 'linkyaar.com · goddie.linkyaar.com', D.links.linkyaar]
-    ].map(([k, v, h]) => `<a class="clink" href="${h}"${ext(h)} data-reveal><span class="clink-k">${k}</span><span class="clink-v">${esc(v)}</span></a>`).join('');
+    $('#contactLinks').innerHTML = D.contactLinks.map(([k, v, h]) => `<a class="clink" href="${h}"${ext(h)} data-reveal><span class="clink-k">${esc(k)}</span><span class="clink-v">${esc(v)}</span></a>`).join('');
 
     $('#quoteText').innerHTML = `“${esc(D.quote.text).replace('appears', '<em>appears</em>')}”`;
     $('#quoteBy').textContent = D.quote.by;
@@ -84,140 +68,139 @@
   /* ================= per-mode content ================= */
   function applyCopy() {
     const C = M[mode];
-    $$('[data-copy]').forEach(el => { const v = C[el.dataset.copy]; if (v == null) return; el.textContent = v; el.dataset.text = v; });
-    $('#heroTitle').innerHTML = C.title.map(l => `<span data-scramble>${esc(l)}</span>`).join('');
+    $$('[data-copy]').forEach(el => { const v = C[el.dataset.copy]; if (v == null) return; el.textContent = v; });
+    $('#heroTitle').innerHTML = C.title.map(l => `<span>${esc(l)}</span>`).join('');
     const c1 = $('#cta1'), c2 = $('#cta2');
     c1.textContent = C.cta1.t; c1.setAttribute('href', C.cta1.h);
     c2.textContent = C.cta2.t; c2.setAttribute('href', C.cta2.h);
     $('#fmsg').placeholder = C.formPlaceholder;
-    $('#glLabel').textContent = 'SWITCHING // ' + C.label.toUpperCase();
-    document.title = `Bhuvan Boddu — ${C.label} mode`;
-  }
-  function renderStats() {
-    $('#stats').innerHTML = M[mode].stats.map(s => `
-      <div class="card stat" data-reveal><div class="stat-v" data-count="${s.v}" data-dec="${s.dec || 0}" data-pre="${esc(s.pre || '')}" data-suf="${esc(s.suf || '')}">${esc((s.pre || '') + '0' + (s.suf || ''))}</div><div class="stat-l">${esc(s.l)}</div></div>`).join('');
-  }
-  function renderFeatured() {
-    $('#featuredGrid').innerHTML = M[mode].featured.map(k => {
-      const f = D.featured[k]; if (!f) return '';
-      const link = f.link ? `<a class="link-arrow" href="${f.link}"${ext(f.link)}>${esc(f.linkText)} ↗</a>` : `<span class="link-arrow disabled">${esc(f.linkText)}</span>`;
-      const link2 = f.link2 ? `<a class="link-arrow" href="${f.link2}"${ext(f.link2)}>Code ↗</a>` : '';
-      return `<article class="card fcard" data-reveal>
-        <div class="fcard-top"><span class="fcard-kind">${esc(f.kind)}</span><span class="fcard-icon">${f.icon}</span></div>
-        <h3>${esc(f.title)}</h3><p>${esc(f.desc)}</p>
-        <div class="tags">${f.tags.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>
-        <div class="fcard-foot"><span class="fcard-metric">${esc(f.metric)}</span><span>${link}${link2 ? ' &nbsp;·&nbsp; ' + link2 : ''}</span></div>
+    document.title = `Bhuvan Boddu · ${C.label}`;
+    $('#stats').innerHTML = C.stats.map(s => `
+      <div class="stat" data-reveal><div class="stat-v" data-count="${s.v}" data-dec="${s.dec || 0}" data-pre="${esc(s.pre || '')}" data-suf="${esc(s.suf || '')}">${esc((s.pre || '') + '0' + (s.suf || ''))}</div><div class="stat-l">${esc(s.l)}</div></div>`).join('');
+    $('#casesGrid').innerHTML = C.cases.map(k => {
+      const c = D.cases[k]; if (!c) return '';
+      const l1 = c.link ? `<a class="arrow-link" href="${c.link}"${ext(c.link)}>${esc(c.linkText)}</a>` : `<span class="arrow-link muted">${esc(c.linkText)}</span>`;
+      const l2 = c.link2 ? `<a class="arrow-link" href="${c.link2}"${ext(c.link2)}>${esc(c.link2Text)}</a>` : '';
+      return `<article class="card case" data-reveal>
+        <div class="case-kind"><span>${esc(c.kind)}</span></div>
+        <h3>${esc(c.title)}</h3>
+        <p class="case-what">${esc(c.what)}</p>
+        <div class="case-row"><b>My role</b><span>${esc(c.role)}</span></div>
+        <div class="case-row"><b>What I owned</b><span>${esc(c.owned)}</span></div>
+        <div class="case-row"><b>Outcome</b><span>${esc(c.outcome)}</span></div>
+        <div class="case-foot"><span class="status tone-${c.tone}">${esc(c.status)}</span><span class="case-links">${l1}${l2}</span></div>
       </article>`;
     }).join('');
+    $('#storySteps').innerHTML = C.story.map(s => `<div class="step"><span class="k">${esc(s.k)}</span><h3>${esc(s.h)}</h3><p>${esc(s.p)}</p></div>`).join('');
+    $('#storyProgress').innerHTML = C.story.map(() => '<i></i>').join('');
+    $('#viewsGrid').innerHTML = C.views.map(v => `<article class="card view" data-reveal><h3>${esc(v.h)}</h3><p>${esc(v.p)}</p></article>`).join('');
+    const pn = $('#problemName'); if (pn) pn.textContent = 'Your problem';
   }
 
-  /* ================= reveal recipes ================= */
+  /* ================= reveals ================= */
   const RECIPES = {
-    builder: () => ({
-      from: { clipPath: 'polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)', x: -28, skewX: -8 },
-      to: { clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)', x: 0, skewX: 0, duration: 0.8, ease: 'power4.out', clearProps: 'clipPath,skewX' }
-    }),
-    founder: () => ({
-      from: { y: 60, opacity: 0, filter: 'brightness(0.2) blur(8px)' },
-      to: { y: 0, opacity: 1, filter: 'brightness(1) blur(0px)', duration: 1.05, ease: 'power3.out', clearProps: 'filter' }
-    }),
-    ai: () => ({
-      from: { opacity: 0, y: 26, scale: 0.97, filter: 'blur(10px)' },
-      to: { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', duration: 0.75, ease: 'power2.out', clearProps: 'filter' }
-    })
+    founder: { from: { y: 40, opacity: 0 }, to: { y: 0, opacity: 1, duration: 1.1, ease: 'power3.out' } },
+    builder: { from: { y: 34, opacity: 0, rotate: 0.6, transformOrigin: 'left bottom' }, to: { y: 0, opacity: 1, rotate: 0, duration: 1.05, ease: 'power3.out' } },
+    engineer: { from: { x: -26, opacity: 0 }, to: { x: 0, opacity: 1, duration: 0.9, ease: 'power4.out' } }
   };
   function onRevealStart(el) {
     const heads = el.matches('.h2') ? [el] : $$('.h2', el);
-    heads.forEach(h => setTimeout(() => h.classList.add('in'), 120));
+    heads.forEach(h => setTimeout(() => h.classList.add('in'), 200));
     $$('[data-count]', el).forEach(countUp);
-    if (mode === 'ai') {
-      const s = el.matches('[data-scramble]') ? [el] : $$('[data-scramble]', el);
-      s.forEach(scramble);
-      if (el.classList.contains('card') && !reduce) { el.classList.add('glitch-in'); setTimeout(() => el.classList.remove('glitch-in'), 600); }
-    }
+    if (el.matches('[data-count]')) countUp(el);
+  }
+  function teardownReveals() {
+    triggers.forEach(t => t.kill()); triggers = [];
+    splits.forEach(s => { try { s.revert(); } catch (e) { /* ignore */ } }); splits = [];
   }
   function setupReveals() {
-    triggers.forEach(t => t.kill()); triggers = [];
+    teardownReveals();
     const els = $$('[data-reveal]');
     $$('.h2').forEach(h => h.classList.remove('in'));
-    if (!hasGsap || reduce) {
-      els.forEach(el => { el.style.opacity = ''; el.style.transform = ''; el.style.clipPath = ''; el.style.filter = ''; onRevealStart(el); });
-      return;
-    }
+    if (!hasGsap || reduce) { els.forEach(el => { el.style.cssText = ''; onRevealStart(el); }); return; }
     gsap.set(els, { clearProps: 'all' });
+    const R = RECIPES[mode];
     els.forEach(el => {
       const sibs = el.parentElement ? Array.from(el.parentElement.children).filter(c => c.hasAttribute('data-reveal')) : [el];
-      const delay = Math.min(Math.max(0, sibs.indexOf(el)), 7) * 0.07;
-      const R = RECIPES[mode]();
-      const tw = gsap.fromTo(el, R.from, Object.assign({}, R.to, { delay, paused: true, onStart: () => onRevealStart(el) }));
-      triggers.push(ScrollTrigger.create({ trigger: el, start: 'top 92%', once: true, onEnter: () => tw.play() }));
+      const delay = Math.min(Math.max(0, sibs.indexOf(el)), 6) * 0.08;
+      const heads = el.matches('.h1, .h2') ? [el] : $$('.h1, .h2', el);
+      let anim;
+      if (hasSplit && heads.length) {
+        anim = gsap.timeline({ paused: true, delay, onStart: () => onRevealStart(el) });
+        heads.forEach(h => {
+          try {
+            const sp = SplitText.create(h, { type: 'lines', mask: 'lines', linesClass: 'sline' }); splits.push(sp);
+            anim.from(sp.lines, { yPercent: 115, duration: 1.1, ease: 'power4.out', stagger: 0.09 }, 0);
+          } catch (e) { anim.from(h, { y: 30, opacity: 0, duration: 1, ease: 'power3.out' }, 0); }
+        });
+        const others = Array.from(el.children).filter(c => !heads.includes(c));
+        if (others.length) anim.from(others, { y: 22, opacity: 0, duration: 0.9, ease: 'power3.out', stagger: 0.08 }, 0.15);
+      } else {
+        anim = gsap.fromTo(el, R.from, Object.assign({}, R.to, { paused: true, delay, onStart: () => onRevealStart(el) }));
+      }
+      triggers.push(ScrollTrigger.create({ trigger: el, start: 'top 90%', once: true, onEnter: () => anim.play() }));
     });
   }
   function countUp(el) {
+    if (el.dataset.done) return; el.dataset.done = '1';
     const to = parseFloat(el.dataset.count), dec = +(el.dataset.dec || 0), pre = el.dataset.pre || '', suf = el.dataset.suf || '';
     if (reduce || !hasGsap) { el.textContent = pre + to.toFixed(dec) + suf; return; }
     const o = { v: 0 };
     gsap.to(o, { v: to, duration: 1.6, ease: 'power3.out', onUpdate: () => { el.textContent = pre + o.v.toFixed(dec) + suf; } });
   }
-  function scramble(el, dur) {
-    dur = dur || 900;
-    const final = el.dataset.text || (el.dataset.text = el.textContent);
-    if (!final.trim() || reduce) { el.textContent = final; return; }
-    const chars = '01<>/[]{}#%&*+=?ABCDEFXYZ';
-    const n = final.length, t0 = performance.now();
-    const at = Array.from({ length: n }, (_, i) => dur * (0.15 + 0.85 * (i / n)) * rand(0.6, 1));
-    const tick = () => {
-      const t = performance.now() - t0; let out = '', done = true;
-      for (let i = 0; i < n; i++) { const ch = final[i]; if (ch === ' ' || t >= at[i]) out += ch; else { done = false; out += chars[Math.floor(Math.random() * chars.length)]; } }
-      el.textContent = out; if (!done) requestAnimationFrame(tick);
-    };
-    tick();
+
+  /* ================= story pin ================= */
+  function setupStory() {
+    storyTrigs.forEach(t => t.kill()); storyTrigs = [];
+    const steps = $$('.step'), bars = $$('#storyProgress i'), list = $('#storySteps');
+    list.classList.remove('has-active'); steps.forEach(s => s.classList.remove('is-active'));
+    if (!hasGsap || reduce) { bars.forEach(b => b.classList.add('on')); return; }
+    if (window.innerWidth >= 900) storyTrigs.push(ScrollTrigger.create({ trigger: '#storyGrid', start: 'top 110px', end: 'bottom bottom', pin: '#storyLeft', pinSpacing: false }));
+    steps.forEach((st, i) => storyTrigs.push(ScrollTrigger.create({
+      trigger: st, start: 'top 62%', end: 'bottom 38%',
+      onToggle: s => { if (s.isActive) { list.classList.add('has-active'); steps.forEach(x => x.classList.toggle('is-active', x === st)); bars.forEach((b, j) => b.classList.toggle('on', j <= i)); } }
+    })));
   }
 
   /* ================= transitions ================= */
   const TR = {
-    builder(swap) {
-      return new Promise(res => {
-        const A = $('.trans-half-a'), B = $('.trans-half-b'), S = $('.trans-slash');
-        const ang = (Math.atan2(-0.2 * window.innerHeight, window.innerWidth) * 180) / Math.PI;
-        gsap.set([A, B, S], { visibility: 'visible' });
-        gsap.set(S, { rotation: ang, clipPath: 'inset(0% 100% 0% 0%)', opacity: 1 });
-        gsap.set(A, { xPercent: 0, yPercent: -100 }); gsap.set(B, { xPercent: 0, yPercent: 100 });
-        gsap.timeline({ onComplete: () => { gsap.set([A, B, S], { visibility: 'hidden' }); res(); } })
-          .to(S, { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.28, ease: 'power3.in' })
-          .to([A, B], { yPercent: 0, duration: 0.32, ease: 'power4.in' }, '-=0.1')
-          .add(swap, '+=0.02')
-          .to(S, { opacity: 0, duration: 0.3 }, '+=0.18')
-          .to(A, { xPercent: -30, yPercent: -100, duration: 0.7, ease: 'power4.inOut' }, '<')
-          .to(B, { xPercent: 30, yPercent: 100, duration: 0.7, ease: 'power4.inOut' }, '<');
-      });
-    },
     founder(swap) {
       return new Promise(res => {
         const I = $('.trans-iris'), Bt = $('.trans-bat'), Hh = $('.trans-hole');
-        gsap.set(I, { visibility: 'visible', clipPath: 'circle(0% at 50% 50%)' });
-        gsap.set(Bt, { scale: 0.2, rotation: -540, opacity: 0 });
+        gsap.set(I, { visibility: 'visible', clipPath: 'circle(0% at 50% 50%)' }); gsap.set(Bt, { scale: 0.2, rotation: -540, opacity: 0 });
         gsap.timeline({ onComplete: () => { gsap.set([I, Hh], { visibility: 'hidden' }); gsap.set(Hh, { width: 0, height: 0 }); res(); } })
           .to(I, { clipPath: 'circle(75% at 50% 50%)', duration: 0.6, ease: 'power2.in' })
           .to(Bt, { scale: 1, rotation: 0, opacity: 1, duration: 0.7, ease: 'power3.out' }, '<0.15')
           .add(swap, '+=0.1')
           .to(Bt, { scale: 1.6, opacity: 0, duration: 0.35, ease: 'power2.in' }, '+=0.25')
-          .set(Hh, { visibility: 'visible', width: 0, height: 0 })
-          .set(I, { visibility: 'hidden' })
+          .set(Hh, { visibility: 'visible', width: 0, height: 0 }).set(I, { visibility: 'hidden' })
           .to(Hh, { width: '320vmax', height: '320vmax', duration: 0.9, ease: 'power2.inOut' });
       });
     },
-    ai(swap) {
+    builder(swap) {
       return new Promise(res => {
-        const G = $('.trans-glitch'), stripes = $$('.gl-stripe'), L = $('#glLabel');
-        gsap.set(G, { visibility: 'visible' }); gsap.set(L, { opacity: 0 });
-        gsap.set(stripes, { xPercent: i => (i % 2 ? 102 : -102) });
-        gsap.timeline({ onComplete: () => { gsap.set(G, { visibility: 'hidden' }); res(); } })
-          .to(stripes, { xPercent: 0, duration: 0.38, ease: 'power3.inOut', stagger: { each: 0.03, from: 'random' } })
-          .to(L, { opacity: 1, duration: 0.12 })
+        const A = $('.trans-ink-2'), B = $('.trans-ink');
+        const start = 'polygon(-10% 0%, -10% 0%, -20% 100%, -20% 100%)', cover = 'polygon(-10% 0%, 110% 0%, 100% 100%, -20% 100%)', exit = 'polygon(110% 0%, 110% 0%, 100% 100%, 100% 100%)';
+        gsap.set([A, B], { visibility: 'visible', clipPath: start });
+        gsap.timeline({ onComplete: () => { gsap.set([A, B], { visibility: 'hidden' }); res(); } })
+          .to(A, { clipPath: cover, duration: 0.55, ease: 'power3.inOut' })
+          .to(B, { clipPath: cover, duration: 0.55, ease: 'power3.inOut' }, 0.14)
           .add(swap, '+=0.05')
-          .to(L, { opacity: 0, duration: 0.15 }, '+=0.4')
-          .to(stripes, { xPercent: i => (i % 2 ? 102 : -102), duration: 0.42, ease: 'power3.inOut', stagger: { each: 0.03, from: 'random' } });
+          .to(A, { clipPath: exit, duration: 0.6, ease: 'power3.inOut' }, '+=0.15')
+          .to(B, { clipPath: exit, duration: 0.6, ease: 'power3.inOut' }, '<0.14');
+      });
+    },
+    engineer(swap) {
+      return new Promise(res => {
+        const G = $('.trans-hud'), ring = $('.trans-hud-ring'), label = $('.trans-hud-label');
+        gsap.set(G, { visibility: 'visible', opacity: 0 }); gsap.set(ring, { scale: 0.5, rotation: -90, opacity: 0 }); gsap.set(label, { opacity: 0 });
+        gsap.timeline({ onComplete: () => { gsap.set(G, { visibility: 'hidden' }); res(); } })
+          .to(G, { opacity: 1, duration: 0.3, ease: 'power2.out' })
+          .to(ring, { scale: 1, rotation: 0, opacity: 1, duration: 0.6, ease: 'power4.out' }, '<0.05')
+          .to(label, { opacity: 1, duration: 0.2 }, '<0.3')
+          .add(swap, '+=0.05')
+          .to(ring, { scale: 1.15, opacity: 0, duration: 0.35, ease: 'power2.in' }, '+=0.3')
+          .to(G, { opacity: 0, duration: 0.5, ease: 'power2.inOut' }, '<0.1');
       });
     }
   };
@@ -225,6 +208,7 @@
   /* ================= mode switching ================= */
   async function switchMode(next, opts) {
     opts = opts || {};
+    if (next === 'ai') next = 'engineer';
     if (!MODES.includes(next) || busy || next === mode) return;
     busy = true;
     const overlay = $('#trans');
@@ -236,61 +220,47 @@
   function applyMode(next) {
     const prev = mode;
     if (prev && THEMES[prev]) { if (THEMES[prev].contactUnmount) THEMES[prev].contactUnmount(); THEMES[prev].unmount(); }
-    if (heroTyper) { heroTyper.stop(); heroTyper = null; }
-    mode = next; html.dataset.mode = next; html.classList.add('has-mode');
-    try { localStorage.setItem('bb-mode', next); } catch (e) { /* private mode */ }
-    const intro = $('#intro'); if (intro) intro.remove();
+    teardownReveals();
+    mode = next; html.dataset.mode = next;
+    try { localStorage.setItem('bb-mode', next); } catch (e) { /* ignore */ }
     const tc = $('meta[name="theme-color"]'); if (tc) tc.setAttribute('content', THEME_COLOR[next]);
-    updateToggle(); applyCopy(); renderStats(); renderFeatured();
+    updateToggle(); applyCopy();
     const T = THEMES[next];
     if (T) {
-      T.mount({ bg: $('#bg'), fx: $('#fx'), stage: $('#arena'), hud: { enemy: $('#hpEnemy'), round: $('#hudRound'), ko: $('#ko'), hint: $('#arenaHint') }, reduce });
+      T.mount({ bg: $('#bg'), fx: $('#fx'), stage: next === 'engineer' ? $('#reactor') : $('#arena'), hero: $('#top'), stats: $('#stats'), excuses: D.excuses,
+        hud: { enemy: $('#hpEnemy'), round: $('#hudRound'), ko: $('#ko'), hint: next === 'engineer' ? $('#reactorHint') : $('#arenaHint'), name: $('#excuseName') },
+        hudVals: $$('#reactor [data-base]'), reduce });
       if (T.contactMount) T.contactMount($('#stage'), $$('.clink'), D);
-      if (next === 'ai' && T.heroTerminal) heroTyper = T.heroTerminal($('#heroTermBody'));
     }
-    mountCursor(); setupReveals();
-    if (hasGsap) requestAnimationFrame(() => ScrollTrigger.refresh());
+    const finish = () => { if (mode !== next) return; setupReveals(); setupStory(); if (hasGsap) requestAnimationFrame(() => ScrollTrigger.refresh()); };
+    if (hasGsap && !reduce && document.fonts && document.fonts.status === 'loading') {
+      gsap.set($$('[data-reveal]'), { opacity: 0 });
+      Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 900))]).then(finish, finish);
+    } else finish();
   }
   function updateToggle() {
     $('.mode-pill').style.setProperty('--i', MODES.indexOf(mode));
     $$('#modeToggle button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === mode)));
   }
 
-  /* ================= cursor + pointer FX ================= */
-  const cur = { x: window.innerWidth / 2, y: window.innerHeight / 2, rx: window.innerWidth / 2, ry: window.innerHeight / 2 };
-  const curDot = $('#cursor'), curRing = $('#cursorRing'), spot = $('#spot');
-  function mountCursor() { html.classList.toggle('fx-cursor', !reduce && fine); }
-  function cursorLoop() {
-    requestAnimationFrame(cursorLoop);
-    cur.rx += (cur.x - cur.rx) * 0.16; cur.ry += (cur.y - cur.ry) * 0.16;
-    if (html.classList.contains('fx-cursor')) {
-      curDot.style.transform = `translate(${cur.x}px, ${cur.y}px)`;
-      curRing.style.transform = `translate(${cur.rx}px, ${cur.ry}px)`;
-    }
-    if (mode === 'founder') spot.style.transform = `translate(${cur.rx}px, ${cur.ry}px)`;
-  }
+  /* ================= pointer / click ================= */
+  const spot = $('#spot'); const cur = { x: window.innerWidth / 2, y: window.innerHeight / 2, rx: window.innerWidth / 2, ry: window.innerHeight / 2 };
+  function spotLoop() { requestAnimationFrame(spotLoop); if (mode !== 'founder' || !spot) return; cur.rx += (cur.x - cur.rx) * 0.12; cur.ry += (cur.y - cur.ry) * 0.12; spot.style.transform = `translate(${cur.rx}px, ${cur.ry}px)`; }
   document.addEventListener('pointermove', e => {
     cur.x = e.clientX; cur.y = e.clientY;
     if (mode && THEMES[mode] && THEMES[mode].pointer) THEMES[mode].pointer(e.clientX, e.clientY);
-    const t = e.target && e.target.closest ? e.target.closest('a, button, .card, input, textarea, .country, .chip') : null;
-    html.classList.toggle('cursor-hover', !!t);
-    const c = e.target && e.target.closest ? e.target.closest('.card, .btn-primary') : null;
-    if (c) {
-      const r = c.getBoundingClientRect();
-      c.style.setProperty('--mx', ((e.clientX - r.left) / r.width) * 100 + '%');
-      c.style.setProperty('--my', ((e.clientY - r.top) / r.height) * 100 + '%');
-      if (mode === 'ai' && hasGsap && !reduce && c.classList.contains('card')) {
-        const rx = ((e.clientY - r.top) / r.height - 0.5) * -7, ry = ((e.clientX - r.left) / r.width - 0.5) * 7;
-        gsap.to(c, { rotationX: rx, rotationY: ry, transformPerspective: 900, duration: 0.5, ease: 'power2.out', overwrite: 'auto' });
-      }
+    if (fine && !reduce && hasGsap) {
+      const b = e.target.closest ? e.target.closest('.btn') : null;
+      if (b) { const r = b.getBoundingClientRect(); gsap.to(b, { x: (e.clientX - (r.left + r.width / 2)) * 0.16, y: (e.clientY - (r.top + r.height / 2)) * 0.22, duration: 0.5, ease: 'power3.out', overwrite: 'auto' }); }
     }
   }, { passive: true });
   document.addEventListener('pointerout', e => {
-    const c = e.target && e.target.closest ? e.target.closest('.card') : null;
-    if (c && mode === 'ai' && hasGsap && !reduce && !(e.relatedTarget && c.contains(e.relatedTarget))) gsap.to(c, { rotationX: 0, rotationY: 0, duration: 0.6, ease: 'power2.out', overwrite: 'auto' });
+    const b = e.target.closest ? e.target.closest('.btn') : null;
+    if (b && hasGsap && !(e.relatedTarget && b.contains(e.relatedTarget))) gsap.to(b, { x: 0, y: 0, duration: 0.7, ease: 'elastic.out(1, 0.5)', overwrite: 'auto' });
   });
+  window.addEventListener('scroll', () => { if (mode && THEMES[mode] && THEMES[mode].scroll) THEMES[mode].scroll(window.scrollY); }, { passive: true });
   document.addEventListener('click', e => {
-    if (!mode || e.target.closest('#intro') || e.target.closest('#trans')) return;
+    if (!mode || e.target.closest('#trans')) return;
     const T = THEMES[mode];
     if (T && T.click) T.click(e.clientX, e.clientY, e);
     const btn = e.target.closest('.btn'); if (btn) buttonFx(btn, e);
@@ -298,9 +268,10 @@
   function retrigger(el, cls) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
   function buttonFx(btn, e) {
     const r = btn.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
-    if (mode === 'builder') { retrigger(btn, 'struck'); if (hasGsap && !reduce) gsap.fromTo('#main', { x: -4 }, { x: 0, duration: 0.35, ease: 'elastic.out(1, 0.3)' }); }
+    if (mode === 'builder') retrigger(btn, 'struck');
     else if (mode === 'founder') { retrigger(btn, 'lit'); ripple(btn, x, y); }
-    else { retrigger(btn, 'glitched'); ripple(btn, x, y); zaps(btn, x, y); }
+    else { retrigger(btn, 'pulse'); ripple(btn, x, y); }
+    if (window.SOUND) window.SOUND.play('click');
   }
   function ripple(btn, x, y) {
     if (reduce || !hasGsap) return;
@@ -309,22 +280,29 @@
     btn.appendChild(el);
     gsap.to(el, { width: 300, height: 300, opacity: 0, duration: 0.75, ease: 'power2.out', onComplete: () => el.remove() });
   }
-  function zaps(btn, x, y) {
-    if (reduce) return;
-    for (let i = 0; i < 6; i++) {
-      const z = document.createElement('i'); z.className = 'zap';
-      z.style.left = x + 'px'; z.style.top = y + 'px'; z.style.setProperty('--r', i * 60 + rand(-22, 22) + 'deg');
-      btn.appendChild(z); setTimeout(() => z.remove(), 520);
-    }
-  }
 
-  /* ================= nav ================= */
+  /* ================= smooth scroll & nav ================= */
+  function scrollToTarget(sel) {
+    const el = $(sel); if (!el) return;
+    if (smoother) smoother.scrollTo(el, true, 'top 72px');
+    else { const y = el.getBoundingClientRect().top + window.scrollY - 72; window.scrollTo({ top: y, behavior: reduce ? 'auto' : 'smooth' }); }
+  }
+  function initSmooth() {
+    if (hasSmoother && !reduce && fine && window.innerWidth >= 900) {
+      try { smoother = ScrollSmoother.create({ wrapper: '#smooth-wrapper', content: '#smooth-content', smooth: 1.1, effects: true, smoothTouch: 0, normalizeScroll: false }); } catch (e) { smoother = null; }
+    }
+    if (!smoother) html.classList.add('native-scroll');
+    document.addEventListener('click', e => {
+      const a = e.target.closest ? e.target.closest('a[href^="#"]') : null; if (!a) return;
+      const href = a.getAttribute('href'); if (href.length < 2) return;
+      e.preventDefault(); scrollToTarget(href); $('#nav').classList.remove('open');
+    });
+  }
   function initNav() {
     const nav = $('#nav');
     const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 24);
     window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
     $('#burger').addEventListener('click', () => nav.classList.toggle('open'));
-    $$('.nav-links a').forEach(a => a.addEventListener('click', () => nav.classList.remove('open')));
     $('#modeToggle').addEventListener('click', e => { const b = e.target.closest('button[data-mode]'); if (b) switchMode(b.dataset.mode); });
     if (hasGsap) $$('main section[id]').forEach(sec => ScrollTrigger.create({
       trigger: sec, start: 'top 50%', end: 'bottom 50%',
@@ -332,11 +310,17 @@
     }));
     document.addEventListener('keydown', e => {
       if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
-      if (e.key === '1') switchMode('builder'); else if (e.key === '2') switchMode('founder'); else if (e.key === '3') switchMode('ai');
+      if (e.key === '1') switchMode('founder'); else if (e.key === '2') switchMode('builder'); else if (e.key === '3') switchMode('engineer');
     });
   }
+  function initSound() {
+    const btn = $('#soundToggle'), label = $('.sound-label');
+    const set = on => { btn.setAttribute('aria-pressed', String(on)); if (label) label.textContent = on ? 'Sound on' : 'Sound off'; };
+    set(false);
+    btn.addEventListener('click', () => { if (!window.SOUND) return; const on = !window.SOUND.isEnabled(); window.SOUND.setEnabled(on); set(on); if (on) window.SOUND.play('click'); });
+  }
 
-  /* ================= filters / timeline / form / intro ================= */
+  /* ================= filters / form ================= */
   function initFilters() {
     $('#filters').addEventListener('click', e => {
       const b = e.target.closest('.fbtn'); if (!b) return;
@@ -344,41 +328,38 @@
       const f = b.dataset.f, cards = $$('.repo');
       cards.forEach(c => c.classList.toggle('hide', !(f === 'all' || c.dataset.cats.split(' ').includes(f))));
       const shown = cards.filter(c => !c.classList.contains('hide'));
-      if (hasGsap && !reduce) gsap.fromTo(shown, { opacity: 0, y: 14, clipPath: 'none' }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.03, ease: 'power2.out', overwrite: true, clearProps: 'clipPath' });
+      if (hasGsap && !reduce) gsap.fromTo(shown, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.45, stagger: 0.03, ease: 'power2.out', overwrite: true });
       if (hasGsap) ScrollTrigger.refresh();
     });
   }
-  function initTimeline() {
-    if (!hasGsap) { $('.tl-line').style.setProperty('--p', 1); return; }
-    ScrollTrigger.create({ trigger: '#timeline', start: 'top 75%', end: 'bottom 70%', scrub: 0.4, onUpdate: s => $('.tl-line').style.setProperty('--p', s.progress.toFixed(3)) });
-  }
   function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove('show'), 2800); }
   function initForm() {
+    const msg = $('#fmsg'), pn = $('#problemName');
+    msg.addEventListener('input', () => { if (!pn) return; const v = msg.value.trim(); pn.textContent = v ? (v.length > 34 ? v.slice(0, 34) + '…' : v) : 'Your problem'; });
     $('#cform').addEventListener('submit', e => {
       e.preventDefault();
-      const name = $('#fname').value.trim(), from = $('#femail').value.trim(), msg = $('#fmsg').value.trim();
-      const subject = encodeURIComponent(`[${M[mode].label} mode] ${name || 'Hello'} → Bhuvan`);
-      const body = encodeURIComponent(`${msg}\n\n— ${name}${from ? ' (' + from + ')' : ''}`);
-      toast({ builder: 'Challenge sent — opening your mail app', founder: 'Signal sent — opening your mail app', ai: 'Prompt dispatched — opening your mail app' }[mode]);
-      setTimeout(() => { window.location.href = `mailto:${D.email}?subject=${subject}&body=${body}`; }, 450);
-    });
-  }
-  function initIntro() {
-    const intro = $('#intro'); if (!intro) return;
-    intro.addEventListener('click', e => {
-      const p = e.target.closest('[data-pick]'); if (p) { switchMode(p.dataset.pick); return; }
-      if (e.target.closest('#introSkip')) switchMode('founder');
+      const name = $('#fname').value.trim(), from = $('#femail').value.trim(), body = msg.value.trim();
+      const subject = encodeURIComponent(`${name || 'Hello'} → Bhuvan (${M[mode].label})`);
+      const text = encodeURIComponent(`${body}\n\n— ${name}${from ? ' (' + from + ')' : ''}`);
+      toast({ founder: 'Signal sent. Opening your mail app.', builder: 'Problem received. Opening your mail app.', engineer: 'Transmitting. Opening your mail app.' }[mode]);
+      setTimeout(() => { window.location.href = `mailto:${D.email}?subject=${subject}&body=${text}`; }, 450);
     });
   }
 
   /* ================= boot ================= */
   function init() {
     html.classList.remove('no-js');
-    renderStatic(); initNav(); initFilters(); initTimeline(); initForm(); initIntro(); cursorLoop();
+    renderStatic(); initSmooth(); initNav(); initSound(); initFilters(); initForm(); spotLoop();
     let saved = null;
     try { saved = new URLSearchParams(window.location.search).get('mode') || localStorage.getItem('bb-mode'); } catch (e) { /* ignore */ }
-    if (saved && MODES.includes(saved)) switchMode(saved, { instant: true });
-    else html.classList.remove('has-mode');
+    if (saved === 'ai') saved = 'engineer';
+    const initial = MODES.includes(saved) ? saved : 'founder';
+    const go = () => switchMode(initial, { instant: true });
+    if (document.fonts && document.fonts.load) {
+      const faces = ['400 1em Inter', '600 1em Inter', '400 1em "Bebas Neue"', 'italic 600 1em Fraunces', '600 1em Fraunces', '700 1em "Space Grotesk"', '400 1em "JetBrains Mono"'];
+      Promise.race([Promise.all(faces.map(f => document.fonts.load(f).catch(() => null))), new Promise(r => setTimeout(r, 2600))]).then(go, go);
+    } else go();
+    let rt = 0; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (hasGsap) { setupStory(); ScrollTrigger.refresh(); } }, 200); });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

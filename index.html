@@ -3,28 +3,28 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Bhuvan Boddu — Founder · Builder · AI Engineer</title>
-<meta name="description" content="Boddu Venkata Sai Bhuvan — founding CTO who took Aharyas to ~$4K MRR, solo builder of LinkYaar and 8+ live products, AI engineer who pre-trained a 109.5M-parameter LLM that beats GPT-2. Three modes, one portfolio." />
-<meta name="theme-color" content="#06070c" />
-<meta property="og:title" content="Bhuvan Boddu — Founder · Builder · AI Engineer" />
-<meta property="og:description" content="Founding CTO · solo builder of 8+ live products · pre-trained an LLM that beats GPT-2. Switch between Builder, Founder and AI Engineer modes." />
+<title>Bhuvan Boddu · Founder</title>
+<meta name="description" content="Boddu Venkata Sai Bhuvan. Founding CTO who took Aharyas from zero to ~$4K MRR, solo founder of LinkYaar, board member at BetterIntegrations, AI engineer who pre-trained an LLM that beats GPT-2. Three modes: Founder, Builder, AI Engineer." />
+<meta name="theme-color" content="#0c1220" />
+<meta property="og:title" content="Bhuvan Boddu · Founder · Builder · AI Engineer" />
+<meta property="og:description" content="I build consumer businesses from the ground up. Founding CTO, solo founder of 8+ live products, and the engineer who trained an LLM that beats GPT-2 for $1,150." />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://bhuvanbodduprofile.vercel.app/" />
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&family=Bebas+Neue&family=Chakra+Petch:wght@500;600;700&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Bebas+Neue&family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;1,9..144,600;1,9..144,700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="css/base.css" />
-<link rel="stylesheet" href="css/builder.css" />
 <link rel="stylesheet" href="css/founder.css" />
-<link rel="stylesheet" href="css/ai.css" />
+<link rel="stylesheet" href="css/builder.css" />
+<link rel="stylesheet" href="css/engineer.css" />
 <script>
   (function () {
     try {
-      var p = new URLSearchParams(location.search).get('mode');
-      var m = p || localStorage.getItem('bb-mode');
-      if (m && ['builder', 'founder', 'ai'].indexOf(m) > -1) { document.documentElement.setAttribute('data-mode', m); document.documentElement.classList.add('has-mode'); }
+      var p = new URLSearchParams(location.search).get('mode') || localStorage.getItem('bb-mode');
+      if (p === 'ai') p = 'engineer';
+      if (p && ['founder', 'builder', 'engineer'].indexOf(p) > -1) document.documentElement.setAttribute('data-mode', p);
     } catch (e) {}
   })();
 </script>
@@ -33,170 +33,136 @@
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="bat" viewBox="0 0 200 100"><path d="M100 28 L106 10 L112 30 C140 14 172 12 200 24 C182 36 172 52 168 66 C160 54 150 50 142 56 C138 68 132 76 126 84 C120 72 112 66 106 70 C104 78 102 84 100 90 C98 84 96 78 94 70 C88 66 80 72 74 84 C68 76 62 68 58 56 C50 50 40 54 32 66 C28 52 18 36 0 24 C28 12 60 14 88 30 L94 10 Z"/></symbol>
-  <symbol id="ic-sword" viewBox="0 0 24 24"><path d="M14.5 3 21 9.5l-1.4 1.4-1-1L12 16.5l1.2 1.2-1.4 1.4-2.1-2.1-3.2 3.2-2.7-2.7 3.2-3.2L4.9 12.2l1.4-1.4 1.2 1.2 6.6-6.6-1-1L14.5 3z"/></symbol>
-  <symbol id="ic-chip" viewBox="0 0 24 24"><path d="M9 2h2v3h2V2h2v3h2a2 2 0 0 1 2 2v2h3v2h-3v2h3v2h-3v2a2 2 0 0 1-2 2h-2v3h-2v-3h-2v3H9v-3H7a2 2 0 0 1-2-2v-2H2v-2h3v-2H2V9h3V7a2 2 0 0 1 2-2h2V2zm-2 5v10h10V7H7zm2 2h6v6H9V9z"/></symbol>
 </svg>
 
-<!-- ============ intro: choose your mode ============ -->
-<div id="intro" class="intro" aria-label="Choose a mode">
-  <div class="intro-head">
-    <span class="intro-brand">bhuvan.build</span>
-    <button class="intro-skip" id="introSkip" type="button">Skip → Founder</button>
-  </div>
-  <div class="intro-title">
-    <p class="intro-kicker">One person · three modes</p>
-    <h1>Which Bhuvan do you want to meet?</h1>
-  </div>
-  <div class="intro-panels">
-    <button class="intro-panel p-builder" data-pick="builder" type="button">
-      <div class="ip-art"></div>
-      <div class="ip-body">
-        <span class="ip-kicker">⚔️ Shadow Fight</span>
-        <h2>Builder</h2>
-        <p>41 repos. 8+ live products. LinkYaar built solo in three days. Ship or die.</p>
-        <span class="ip-cta">Enter the arena →</span>
-      </div>
-    </button>
-    <button class="intro-panel p-founder" data-pick="founder" type="button">
-      <div class="ip-art"></div>
-      <div class="ip-body">
-        <span class="ip-kicker">🦇 Gotham</span>
-        <h2>Founder</h2>
-        <p>Founding CTO. Zero to ~$4K MRR. ₹14L raised. A ₹10 Cr pipeline. No cape required.</p>
-        <span class="ip-cta">Light the signal →</span>
-      </div>
-    </button>
-    <button class="intro-panel p-ai" data-pick="ai" type="button">
-      <div class="ip-art"></div>
-      <div class="ip-body">
-        <span class="ip-kicker">🧠 Neural</span>
-        <h2>AI Engineer</h2>
-        <p>Pre-trained an LLM that beats GPT-2. 20+ microservices on H100s. Agents you command from WhatsApp.</p>
-        <span class="ip-cta">Open a session →</span>
-      </div>
-    </button>
-  </div>
-  <p class="intro-foot">Switch anytime from the top bar · keys 1 / 2 / 3</p>
-</div>
-
-<!-- ============ ambient layers ============ -->
 <canvas id="bg" class="bg-canvas" aria-hidden="true"></canvas>
 <canvas id="fx" class="fx-canvas" aria-hidden="true"></canvas>
-<div class="scanlines" aria-hidden="true"></div>
 <div id="spot" class="spotlight" aria-hidden="true"></div>
-<div id="cursor" class="cursor" aria-hidden="true"><i class="cursor-dot"></i></div>
-<div id="cursorRing" class="cursor" aria-hidden="true"><i class="cursor-ring"></i></div>
 
-<!-- ============ mode transition overlay ============ -->
 <div id="trans" class="trans" aria-hidden="true">
-  <div class="trans-slash"></div>
-  <div class="trans-half trans-half-a"></div>
-  <div class="trans-half trans-half-b"></div>
   <div class="trans-iris"><svg class="trans-bat" viewBox="0 0 200 100"><use href="#bat"/></svg></div>
   <div class="trans-hole"></div>
-  <div class="trans-glitch">
-    <i class="gl-stripe"></i><i class="gl-stripe"></i><i class="gl-stripe"></i><i class="gl-stripe"></i><i class="gl-stripe"></i>
-    <i class="gl-stripe"></i><i class="gl-stripe"></i><i class="gl-stripe"></i><i class="gl-stripe"></i><i class="gl-stripe"></i>
-    <span class="gl-label" id="glLabel">SWITCHING // AI ENGINEER</span>
-  </div>
+  <div class="trans-ink-2"></div>
+  <div class="trans-ink"></div>
+  <div class="trans-hud"><div class="trans-hud-ring"></div><div class="trans-hud-label">Assembling</div></div>
 </div>
 
-<!-- ============ nav ============ -->
 <header class="nav" id="nav">
   <div class="wrap nav-inner">
-    <a href="#top" class="logo"><span class="logo-mark">B</span><span class="logo-text">bhuvan<span class="logo-dot">.</span>build</span></a>
+    <a href="#top" class="brand">Bhuvan Boddu</a>
     <nav class="nav-links" id="navLinks" aria-label="Sections">
-      <a href="#featured">Featured</a>
-      <a href="#ventures">Ventures</a>
-      <a href="#experience">Experience</a>
+      <a href="#cases">Cases</a>
+      <a href="#story">Story</a>
+      <a href="#track">Track record</a>
       <a href="#work">Work</a>
-      <a href="#skills">Skills</a>
       <a href="#world">World</a>
       <a href="#contact">Contact</a>
     </nav>
-    <div class="mode-toggle" id="modeToggle" role="group" aria-label="Switch portfolio mode">
-      <span class="mode-pill" aria-hidden="true"></span>
-      <button type="button" data-mode="builder" aria-pressed="false" title="Builder mode (1)"><svg><use href="#ic-sword"/></svg><span class="ml">Builder</span></button>
-      <button type="button" data-mode="founder" aria-pressed="false" title="Founder mode (2)"><svg viewBox="0 0 200 100" style="width:18px"><use href="#bat"/></svg><span class="ml">Founder</span></button>
-      <button type="button" data-mode="ai" aria-pressed="false" title="AI Engineer mode (3)"><svg><use href="#ic-chip"/></svg><span class="ml">AI Eng</span></button>
+    <div class="nav-right">
+      <button class="sound-toggle" id="soundToggle" type="button" aria-pressed="false" title="Toggle sound"><span class="sound-bars"><i></i><i></i><i></i></span><span class="sound-label">Sound off</span></button>
+      <div class="mode-toggle" id="modeToggle" role="group" aria-label="Switch mode">
+        <span class="mode-pill" aria-hidden="true"></span>
+        <button type="button" data-mode="founder" aria-pressed="false" title="Founder (1)">Founder</button>
+        <button type="button" data-mode="builder" aria-pressed="false" title="Builder (2)">Builder</button>
+        <button type="button" data-mode="engineer" aria-pressed="false" title="AI Engineer (3)">AI Engineer</button>
+      </div>
+      <button class="burger" id="burger" type="button" aria-label="Menu"><span></span><span></span></button>
     </div>
-    <button class="burger" id="burger" type="button" aria-label="Menu"><span></span><span></span></button>
   </div>
 </header>
 
+<div id="smooth-wrapper"><div id="smooth-content">
 <main id="main">
 
   <!-- ============ hero ============ -->
   <section class="hero" id="top">
     <div class="wrap hero-grid">
       <div class="hero-copy">
-        <p class="eyebrow" data-copy="eyebrow" data-scramble data-reveal></p>
+        <p class="eyebrow" data-copy="eyebrow" data-reveal></p>
         <h1 class="h1 display hero-title" id="heroTitle" data-reveal></h1>
         <p class="lead" data-copy="sub" data-reveal></p>
         <div class="hero-ctas" data-reveal>
-          <a class="btn btn-primary" id="cta1" href="#contact"></a>
-          <a class="btn btn-ghost" id="cta2" href="#experience"></a>
+          <a class="btn btn-primary" id="cta1" href="#cases"></a>
+          <a class="btn btn-ghost" id="cta2" href="#contact"></a>
         </div>
-        <div class="hero-badges" data-reveal>
-          <span class="badge">🎓 Doctorate — AI for Business, ESGCI Paris</span>
-          <span class="badge">📊 MBA · 2026</span>
-          <span class="badge">🤖 B.Tech AI &amp; Data Science</span>
-          <span class="badge">📍 Chennai → anywhere</span>
-        </div>
+        <p class="hero-meta" data-reveal>Chennai, India · Ready to relocate anywhere · Doctoral candidate, AI for Business, ESGCI Paris</p>
       </div>
 
       <div class="hero-stage" id="heroStage">
         <!-- builder: the arena -->
         <div class="arena only-builder" id="arena">
           <div class="hud">
-            <div class="hud-side"><span class="hud-name">Bhuvan</span><div class="hud-bar"><i id="hpMe" style="width:100%"></i></div></div>
-            <div class="hud-round" id="hudRound">R1</div>
-            <div class="hud-side right"><span class="hud-name">Bugs</span><div class="hud-bar"><i id="hpEnemy" style="width:100%"></i></div></div>
+            <div class="hud-side"><span class="hud-name">Bhuvan</span><div class="hud-bar"><i style="width:100%"></i></div></div>
+            <div class="hud-round" id="hudRound">Round 1</div>
+            <div class="hud-side right"><span class="hud-name excuse" id="excuseName">No budget</span><div class="hud-bar"><i id="hpEnemy" style="width:100%"></i></div></div>
           </div>
-          <div class="ko" id="ko"><span>K.O.</span><small>Bug squashed · feature shipped</small></div>
-          <div class="arena-hint" id="arenaHint">Click / tap the arena to strike</div>
+          <div class="ko" id="ko"><span>K.O.</span><small>Excuse eliminated</small></div>
+          <div class="arena-hint" id="arenaHint">Click or tap the arena to strike</div>
         </div>
 
-        <!-- founder: the case file -->
-        <div class="dossier only-founder">
-          <div class="dossier-head"><span>Case file № 001</span><span>Founding team</span></div>
-          <h3>Aharyas<small>“From Rural to Global” — artisan marketplace</small></h3>
-          <dl class="dossier-rows">
-            <div><dt>Role</dt><dd>CTO &amp; Head of Logistics → Executive Board Consultant</dd></div>
-            <div><dt>Revenue</dt><dd><b>~$4,000 MRR</b> from zero</dd></div>
-            <div><dt>Funding</dt><dd><b>₹14 Lakh</b> MSME + <b>$15K</b> grant</dd></div>
-            <div><dt>Network</dt><dd><b>100+ artisans</b> onboarded, village by village</dd></div>
-            <div><dt>Traffic</dt><dd>10K+ monthly visits · Razorpay checkout</dd></div>
-            <div><dt>Endorsed</dt><dd>KTR, former IT Minister of Telangana</dd></div>
-          </dl>
-          <div class="dossier-foot">
-            <a class="link-arrow" href="https://www.aharyas.com/" target="_blank" rel="noopener">aharyas.com ↗</a>
-            <span class="stamp">Funded</span>
-          </div>
-          <svg class="dossier-bat" viewBox="0 0 200 100" aria-hidden="true"><use href="#bat"/></svg>
-        </div>
-
-        <!-- ai: the training terminal -->
-        <div class="term hero-term only-ai" id="heroTerm">
-          <div class="term-bar"><i></i><i></i><i></i><span>bhuvan@h100 — training</span></div>
-          <pre class="term-body" id="heroTermBody"></pre>
+        <!-- engineer: the reactor -->
+        <div class="reactor only-engineer" id="reactor">
+          <div class="hud-read tl"><span>Core output</span><b data-base="3.2" data-jitter="0.06" data-dec="2" data-suf=" GW">3.20 GW</b><i></i></div>
+          <div class="hud-read tr"><span>Perplexity</span><b>29.19</b><i></i></div>
+          <div class="hud-read bl"><span>Throughput</span><b data-base="320" data-jitter="6" data-dec="0" data-suf="K tok/s">320K tok/s</b><i></i></div>
+          <div class="hud-read br"><span>Uptime</span><b>30 d · 0 failures</b><i></i></div>
+          <div class="reactor-hint" id="reactorHint">Click the reactor</div>
         </div>
       </div>
     </div>
-
     <div class="wrap"><div class="stats" id="stats"></div></div>
-    <div class="scroll-cue" aria-hidden="true"><span></span></div>
   </section>
 
-  <!-- ============ featured ============ -->
-  <section class="section" id="featured">
+  <div class="marquee" id="marquee" aria-hidden="true"><div class="marquee-track" id="marqueeTrack"></div></div>
+
+  <!-- ============ case files ============ -->
+  <section class="section" id="cases">
     <div class="wrap">
       <div class="section-head" data-reveal>
-        <p class="eyebrow" data-copy="featuredEyebrow" data-scramble></p>
-        <h2 class="h2 display" data-copy="featuredTitle" data-scramble></h2>
-        <p class="lead" data-copy="featuredSub"></p>
+        <p class="eyebrow" data-copy="casesEyebrow"></p>
+        <h2 class="h2 display" data-copy="casesTitle"></h2>
+        <p class="lead" data-copy="casesSub"></p>
       </div>
-      <div class="featured-grid" id="featuredGrid"></div>
+      <div class="cases-grid" id="casesGrid"></div>
+    </div>
+  </section>
+
+  <!-- ============ story ============ -->
+  <section class="section" id="story">
+    <div class="wrap">
+      <div class="story-grid" id="storyGrid">
+        <div class="story-left" id="storyLeft">
+          <div class="section-head" data-reveal style="margin-bottom:0">
+            <p class="eyebrow" data-copy="storyEyebrow"></p>
+            <h2 class="h2 display" data-copy="storyTitle"></h2>
+            <p class="lead" data-copy="storySub"></p>
+          </div>
+          <div class="story-progress" id="storyProgress"></div>
+        </div>
+        <div class="story-steps" id="storySteps"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ principles ============ -->
+  <section class="section" id="principles">
+    <div class="wrap">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow" data-copy="principlesEyebrow"></p>
+        <h2 class="h2 display" data-copy="principlesTitle"></h2>
+      </div>
+      <div class="plist" id="principlesList"></div>
+    </div>
+  </section>
+
+  <!-- ============ views ============ -->
+  <section class="section" id="views">
+    <div class="wrap">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow" data-copy="viewsEyebrow"></p>
+        <h2 class="h2 display" data-copy="viewsTitle"></h2>
+      </div>
+      <div class="views-grid" id="viewsGrid"></div>
     </div>
   </section>
 
@@ -210,37 +176,12 @@
     </div>
   </section>
 
-  <!-- ============ principles ============ -->
-  <section class="section" id="principles">
+  <!-- ============ track record ============ -->
+  <section class="section" id="track">
     <div class="wrap">
       <div class="section-head" data-reveal>
-        <p class="eyebrow" data-copy="principlesEyebrow" data-scramble></p>
-        <h2 class="h2 display" data-copy="principlesTitle" data-scramble></h2>
-        <p class="lead" data-copy="principlesSub"></p>
-      </div>
-      <div class="principles-grid" id="principlesGrid"></div>
-    </div>
-  </section>
-
-  <!-- ============ ventures ============ -->
-  <section class="section" id="ventures">
-    <div class="wrap">
-      <div class="section-head" data-reveal>
-        <p class="eyebrow" data-copy="venturesEyebrow" data-scramble></p>
-        <h2 class="h2 display" data-copy="venturesTitle" data-scramble></h2>
-        <p class="lead" data-copy="venturesSub"></p>
-      </div>
-      <div class="ventures" id="venturesList"></div>
-    </div>
-  </section>
-
-  <!-- ============ experience ============ -->
-  <section class="section" id="experience">
-    <div class="wrap">
-      <div class="section-head" data-reveal>
-        <p class="eyebrow" data-copy="expEyebrow" data-scramble></p>
-        <h2 class="h2 display" data-copy="expTitle" data-scramble></h2>
-        <p class="lead" data-copy="expSub"></p>
+        <p class="eyebrow" data-copy="trackEyebrow"></p>
+        <h2 class="h2 display" data-copy="trackTitle"></h2>
       </div>
       <div class="timeline" id="timeline"></div>
     </div>
@@ -250,25 +191,13 @@
   <section class="section" id="work">
     <div class="wrap">
       <div class="section-head" data-reveal>
-        <p class="eyebrow" data-copy="workEyebrow" data-scramble></p>
-        <h2 class="h2 display" data-copy="workTitle" data-scramble></h2>
+        <p class="eyebrow" data-copy="workEyebrow"></p>
+        <h2 class="h2 display" data-copy="workTitle"></h2>
         <p class="lead" data-copy="workSub"></p>
       </div>
       <div class="filters" id="filters" data-reveal></div>
       <div class="repo-grid" id="repoGrid"></div>
-      <p class="work-foot" data-reveal>Full list of 41 repositories on <a class="link-arrow" href="https://github.com/bhuvan0808?tab=repositories" target="_blank" rel="noopener">GitHub ↗</a></p>
-    </div>
-  </section>
-
-  <!-- ============ skills ============ -->
-  <section class="section" id="skills">
-    <div class="wrap">
-      <div class="section-head" data-reveal>
-        <p class="eyebrow" data-copy="skillsEyebrow" data-scramble></p>
-        <h2 class="h2 display" data-copy="skillsTitle" data-scramble></h2>
-        <p class="lead" data-copy="skillsSub"></p>
-      </div>
-      <div class="skills-grid" id="skillsGrid"></div>
+      <p class="work-foot" data-reveal>All 41 repositories are on <a class="arrow-link" href="https://github.com/bhuvan0808?tab=repositories" target="_blank" rel="noopener">GitHub</a></p>
     </div>
   </section>
 
@@ -276,41 +205,38 @@
   <section class="section" id="world">
     <div class="wrap">
       <div class="section-head" data-reveal>
-        <p class="eyebrow" data-copy="worldEyebrow" data-scramble></p>
-        <h2 class="h2 display" data-copy="worldTitle" data-scramble></h2>
+        <p class="eyebrow" data-copy="worldEyebrow"></p>
+        <h2 class="h2 display" data-copy="worldTitle"></h2>
         <p class="lead" data-copy="worldSub"></p>
       </div>
       <div class="world-grid">
         <div>
           <div class="countries" id="countries"></div>
-          <p class="world-note" data-reveal>Every trip starts as a vacation with a list of people whose problems I might be able to solve. If a conversation turns into a deal, it becomes a business. If it doesn’t, I come home with market intelligence and a good holiday.</p>
+          <p class="world-note" data-reveal>Every trip starts as a vacation with a list of people whose problems I might be able to solve. If a conversation turns into a deal, it becomes a business. If it does not, I come home with market intelligence and a good holiday.</p>
         </div>
         <div class="world-facts" id="worldFacts"></div>
       </div>
     </div>
   </section>
 
-  <!-- ============ education ============ -->
+  <!-- ============ education & recognition ============ -->
   <section class="section" id="education">
     <div class="wrap">
       <div class="section-head" data-reveal>
-        <p class="eyebrow" data-copy="eduEyebrow" data-scramble></p>
-        <h2 class="h2 display" data-copy="eduTitle" data-scramble></h2>
-        <p class="lead" data-copy="eduSub"></p>
+        <p class="eyebrow" data-copy="eduEyebrow"></p>
+        <h2 class="h2 display" data-copy="eduTitle"></h2>
       </div>
       <div class="edu-grid" id="eduGrid"></div>
+      <div class="rec-grid" id="recGrid"></div>
     </div>
   </section>
 
-  <!-- ============ beyond ============ -->
-  <section class="section" id="beyond">
-    <div class="wrap">
-      <div class="section-head" data-reveal>
-        <p class="eyebrow" data-copy="beyondEyebrow" data-scramble></p>
-        <h2 class="h2 display" data-copy="beyondTitle" data-scramble></h2>
-        <p class="lead" data-copy="beyondSub"></p>
-      </div>
-      <div class="beyond-grid" id="beyondGrid"></div>
+  <!-- ============ want ============ -->
+  <section class="section want" id="want">
+    <div class="wrap" data-reveal>
+      <p class="eyebrow" data-copy="wantEyebrow"></p>
+      <h2 class="h2 display" data-copy="wantTitle"></h2>
+      <p data-copy="wantText"></p>
     </div>
   </section>
 
@@ -320,37 +246,34 @@
       <div class="contact-grid">
         <div>
           <div class="section-head" data-reveal>
-            <p class="eyebrow" data-copy="contactEyebrow" data-scramble></p>
-            <h2 class="h2 display" data-copy="contactTitle" data-scramble></h2>
+            <p class="eyebrow" data-copy="contactEyebrow"></p>
+            <h2 class="h2 display" data-copy="contactTitle"></h2>
             <p class="lead" data-copy="contactSub"></p>
           </div>
           <div class="contact-links" id="contactLinks"></div>
         </div>
         <div data-reveal>
           <div class="stage" id="stage">
-            <div class="stage-builder only-builder">
-              <div class="vs-row">
-                <div class="vs-name">You<small>Challenger</small></div>
-                <div class="vs-badge">VS</div>
-                <div class="vs-name right">Bhuvan<small>Builder · 41–0</small></div>
-              </div>
-              <p class="vs-status">Press fight to unlock the moves</p>
-              <button class="btn btn-primary" id="fightBtn" type="button">Fight</button>
-            </div>
             <div class="stage-founder only-founder">
-              <div class="clouds"></div>
-              <div class="rain"></div>
-              <div class="beam"></div>
+              <div class="clouds"></div><div class="rain"></div><div class="beam"></div>
               <div class="emblem"><svg viewBox="0 0 200 100"><use href="#bat"/></svg></div>
               <div class="skyline"></div>
-              <p class="signal-msg">Signal received · Gotham answers</p>
+              <p class="signal-msg">Signal received</p>
               <button class="btn btn-primary signal-btn" id="signalBtn" type="button">Light the signal</button>
             </div>
-            <div class="stage-ai only-ai">
-              <div class="term">
-                <div class="term-bar"><i></i><i></i><i></i><span>bhuvan@ai — contact</span><button class="rerun" id="termRerun" type="button">Re-run</button></div>
-                <pre class="term-body" id="contactTermBody"></pre>
+            <div class="stage-builder only-builder">
+              <div class="vs-row">
+                <div class="vs-name">Bhuvan<small>41 repos · 8+ live</small></div>
+                <div class="vs-badge">vs</div>
+                <div class="vs-name problem" id="problemName">Your problem</div>
               </div>
+              <p class="vs-status">Type your problem in the form to send it in</p>
+              <button class="btn btn-primary" id="fightBtn" type="button">Fight</button>
+            </div>
+            <div class="stage-engineer only-engineer">
+              <div class="channel-bar"><span class="dot"></span><span>Secure channel</span><button class="rerun" id="channelRerun" type="button">Re-run</button></div>
+              <div class="channel-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+              <pre class="channel-body" id="channelBody"></pre>
             </div>
           </div>
           <form class="cform" id="cform" novalidate>
@@ -369,19 +292,23 @@
 
 <footer class="footer">
   <div class="wrap footer-inner">
-    <span>© <span id="year">2026</span> Boddu Venkata Sai Bhuvan · <span data-copy="footerLine">Designed &amp; built by hand.</span></span>
-    <span>Switch modes: <span class="kbd">1</span>Builder <span class="kbd">2</span>Founder <span class="kbd">3</span>AI</span>
+    <span>© <span id="year">2026</span> Boddu Venkata Sai Bhuvan · <span data-copy="footerLine">Built by hand.</span></span>
+    <span>Switch modes <span class="kbd">1</span>Founder <span class="kbd">2</span>Builder <span class="kbd">3</span>AI Engineer</span>
   </div>
 </footer>
+</div></div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollSmoother.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/SplitText.min.js"></script>
 <script src="js/data.js"></script>
-<script src="js/fx-builder.js"></script>
+<script src="js/sound.js"></script>
 <script src="js/fx-founder.js"></script>
-<script src="js/fx-ai.js"></script>
+<script src="js/fx-builder.js"></script>
+<script src="js/fx-engineer.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

@@ -1,47 +1,42 @@
-# bhuvan.build — Bhuvan Boddu's portfolio
+# Bhuvan Boddu — portfolio
 
-Live at **https://bhuvanbodduprofile.vercel.app/**
+Live at **https://bhuvanbodduprofile.vercel.app/** (moving to **bhuvan.linkyaar.com**).
 
-One person, three modes. Pick a world on first visit or switch any time from the top bar (or press `1` / `2` / `3`):
+One person, three worlds. The site opens in Founder mode; the switch in the top bar (or keys `1` / `2` / `3`) changes everything: copy, hero scene, reveal motion, page transition, contact stage and optional sound.
 
-| Mode | World | What changes |
+| Mode | World | What you get |
 | --- | --- | --- |
-| **Builder** | Shadow Fight | Ember ambience, silhouette fighters in the hero (click the arena to strike — knock out the bugs), diagonal slash reveals, strike buttons, ember cursor trail, a "VS" contact stage. |
-| **Founder** | Gotham | Rain, generated skyline, a signal that follows the cursor, lightning on click, searchlight reveals, a case-file card, "Light the signal" contact stage. |
-| **AI Engineer** | Neural | Node-graph with travelling pulses that react to the pointer, glitch + scramble reveals, holographic tilt cards, typed terminals in the hero and contact. |
+| **Founder** (default) | Gotham | Night city drawn live in three parallax layers, two depths of rain, a signal that follows the cursor while you are in the sky, lightning with thunder. Case files with equal weight, a pinned "ground truth" story, principles, market instinct, "Light the signal" contact. |
+| **Builder** | Shadow Fight | A sunlit bamboo forest painted into the hero, a samurai silhouette with a katana versus an opponent called Excuses. Click the arena to strike; knock an excuse out and the next steps in. Paper sections, ink type, "Bhuvan vs your problem" contact. |
+| **AI Engineer** | Stark | A live arc reactor with counter-rotating rings, a core that tilts toward the pointer and repulsor pulses on click, HUD readouts, warm workshop palette, "Open a channel" typed contact. |
 
-Each mode has its own copy, hero widget, stats, featured work, section titles, reveal animation, button and click effects, cursor, and page transition (slash cut / bat iris / glitch stripes).
+Sound is off by default. The toggle enables synthesized cues (sword, hits, thunder, reactor hum, beeps) generated with the Web Audio API. No audio files, no copyrighted assets: every scene is drawn in code.
 
 ## Stack
 
-Static HTML, CSS and vanilla JS. [GSAP 3](https://gsap.com/) + ScrollTrigger from cdnjs for reveals and transitions; everything else (canvas engines, fighters, skyline, node graph, terminals) is hand-written. No build step.
+Static HTML, CSS and vanilla JS. GSAP 3.13 with ScrollTrigger, ScrollSmoother and SplitText from cdnjs for smooth scrolling, masked line reveals and pinning. Canvas engines, silhouettes, skyline, reactor, terminals and sounds are hand-written. No build step.
 
 ```
-index.html          page skeleton, intro chooser, transition overlay
-css/base.css        layout + shared components
-css/builder.css     Shadow Fight theme
-css/founder.css     Gotham theme
-css/ai.css          Neural theme
-js/data.js          all content (profile, per-mode copy, ventures, repos, skills…)
-js/fx-builder.js    arena engine: fighters, embers, slashes, sparks, cursor trail
-js/fx-founder.js    skyline, rain, clouds, signal, lightning
-js/fx-ai.js         node graph, pulses, terminals
-js/app.js           mode manager, rendering, reveals, transitions, cursor, nav, form
+index.html          page skeleton, transition overlays, per-mode hero and contact stages
+css/base.css        layout, type, shared components
+css/founder.css     Gotham tokens and stage
+css/builder.css     Shadow Fight tokens, arena HUD and stage
+css/engineer.css    Stark tokens, reactor HUD and channel
+js/data.js          all content: per-mode copy, case files, story beats, principles, views, track record, repos, world, education
+js/sound.js         Web Audio sound design and ambience
+js/fx-founder.js    skyline layers, rain, clouds, signal, lightning
+js/fx-builder.js    bamboo forest, samurai vs excuses, slashes, leaves
+js/fx-engineer.js   arc reactor, HUD values, typed channel
+js/app.js           mode manager, rendering, smooth scroll, reveals, transitions, nav, form
 ```
 
 ## Editing content
 
-Everything textual lives in `js/data.js`. Per-mode headlines, stats and featured picks are under `modes.<builder|founder|ai>`; the featured pool, ventures ledger, experience, repos, skills, countries, education and "beyond" lists sit next to it.
+Everything textual lives in `js/data.js`. Per-mode copy sits under `modes.founder`, `modes.builder` and `modes.engineer`; the shared pools (case files, principles, experience, repos, world, education, recognition) sit next to them.
 
 ## Running locally
 
-Any static server works, for example:
-
-```
-npx serve .
-```
-
-Deep-link a mode with `?mode=builder`, `?mode=founder` or `?mode=ai`. The last chosen mode is remembered in `localStorage`. `prefers-reduced-motion` disables the canvases, custom cursor and reveal animations.
+Any static server works, for example `npx serve .`. Deep-link a mode with `?mode=founder`, `?mode=builder` or `?mode=engineer`. The last chosen mode is remembered. `prefers-reduced-motion` disables the canvases, smooth scrolling and reveal motion.
 
 ## Deploy
 
